@@ -945,7 +945,6 @@
   <ItemGroup>
     <None Include="shaders\VertexShader.glsl" />
     <None Include="shaders\FragmentShader.glsl" />
-    <None Include="shaders\displace.glsl" />
     <None Include="glfw\include\glm\detail\func_common.inl">
       <Filter>Arquivos de Cabeçalho</Filter>
     </None>
@@ -1369,6 +1368,7 @@
     <None Include="glfw\include\glm\out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_CXX.bin">
       <Filter>Arquivos de Recurso</Filter>
     </None>
+    <None Include="shaders\TessControlShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="glfw\glfw3.lib" />

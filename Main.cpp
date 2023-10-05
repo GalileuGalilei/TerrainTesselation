@@ -94,6 +94,7 @@ void InitOpenGL()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	//errors
 	//glEnable(GL_DEBUG_OUTPUT);
@@ -111,8 +112,8 @@ int main()
 	ShaderProgram SHADER;
 	
 	SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
+	SHADER.CreateShader(GL_TESS_CONTROL_SHADER, "shaders/TessControlShader.glsl");
 	SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
-	SHADER.CreateComputeShader("displace", "shaders/displace.glsl");
 	SHADER.Use();
 
 	//textures
