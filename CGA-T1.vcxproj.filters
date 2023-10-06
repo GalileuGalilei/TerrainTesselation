@@ -27,9 +27,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="camera\cam.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="src\Texture.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -51,9 +48,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="GLAD\include\glad\glad.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="camera\cam.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="glfw\include\glad\glad.h">
@@ -1369,8 +1363,14 @@
       <Filter>Arquivos de Recurso</Filter>
     </None>
     <None Include="shaders\TessControlShader.glsl" />
+    <None Include="shaders\TessEvaluationShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="glfw\glfw3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\heightmap.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
   </ItemGroup>
 </Project>

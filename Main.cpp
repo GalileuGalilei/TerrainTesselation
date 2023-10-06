@@ -8,6 +8,7 @@
 
 int window_width = 520;
 int window_heigh = 520;
+int tessLevel = 8;
 Camera cam(window_width, window_heigh);
 GLFWwindow* window;
 
@@ -16,10 +17,10 @@ GLFWwindow* window;
 std::vector<float> squarePosition =
 {          
 	//quadrado que chegue at[e as bordas da tela
-	-1.0f, 1.0f, 0.0f,	//0
-	1.0f, 1.0f, 0.0f,	//1
-	1.0f, -1.0f, 0.0f,	//3
-	-1.0f, -1.0f, 0.0f	//2
+	-1.0f, 0.0f, 1.0f, 	//0
+	1.0f, 0.0f, 1.0f,	//1
+	1.0f, 0.0f, -1.0f,	//3
+	-1.0f, 0.0f, -1.0f	//2
 };
 
 std::vector<float> squareTexture =
@@ -32,8 +33,7 @@ std::vector<float> squareTexture =
 
 std::vector<GLuint> SquareIndice =
 {
-	0,1,3, //triangle
-	3,2,1  //triangle
+	0,1,3,2
 };
 
 #pragma endregion
@@ -63,6 +63,16 @@ void OnKeyInput(GLFWwindow* window, int, int, int, int)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		tessLevel++;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		tessLevel--;
 	}
 }
 
@@ -94,7 +104,7 @@ void InitOpenGL()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	//errors
 	//glEnable(GL_DEBUG_OUTPUT);
@@ -113,11 +123,12 @@ int main()
 	
 	SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
 	SHADER.CreateShader(GL_TESS_CONTROL_SHADER, "shaders/TessControlShader.glsl");
+	SHADER.CreateShader(GL_TESS_EVALUATION_SHADER, "shaders/TessEvaluationShader.glsl");
 	SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
 	SHADER.Use();
 
 	//textures
-	Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
+	Texture* tex = new Texture("resources/heightmap.jpg", true, GL_RGBA32F);
 	SHADER.SetTexture(tex, "Texture0");
 
 	//vertices
@@ -128,7 +139,8 @@ int main()
 		
 	//transformations
 	glm::mat4 model_matrix(1.0f);
-	int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model_matrix");
+	int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
+	int tess_level_loc = glGetUniformLocation(SHADER.ShaderProgramID, "tessLevel");
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
@@ -147,6 +159,7 @@ int main()
 
 		//models uniforms
 		glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
+		glUniform1i(tess_level_loc, tessLevel);
 
 		//drawing
 		mesh->DrawMesh();

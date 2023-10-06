@@ -155,7 +155,6 @@
   <ItemGroup>
     <ClCompile Include="glfw\include\glm\detail\glm.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="camera\cam.cpp" />
     <ClCompile Include="GLAD\src\glad.c" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\ShaderPro.cpp" />
@@ -457,7 +456,6 @@
     <ClInclude Include="glfw\include\glm\vector_relational.hpp" />
     <ClInclude Include="glfw\include\KHR\khrplatform.h" />
     <ClInclude Include="include\Camera.h" />
-    <ClInclude Include="camera\cam.h" />
     <ClInclude Include="GLAD\include\glad\glad.h" />
     <ClInclude Include="glfw\include\glad\glad.h" />
     <ClInclude Include="include\ShadersPro.h" />
@@ -609,11 +607,15 @@
     <None Include="glfw\include\glm\out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_C.bin" />
     <None Include="glfw\include\glm\out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_CXX.bin" />
     <None Include="shaders\FragmentShader.glsl" />
+    <None Include="shaders\TessEvaluationShader.glsl" />
     <None Include="shaders\VertexShader.glsl" />
     <None Include="shaders\TessControlShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="glfw\glfw3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\heightmap.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,12 +1,11 @@
 #version 450 core
 
+in float Height;
+
 out vec4 FragColor;
-//uniform float time; //temporariamente inutil
-in vec2 tcTexCoord;
-uniform sampler2D Texture0;
 
 void main()
 {
-	FragColor = texture(Texture0, tcTexCoord);
-	FragColor = vec4(FragColor.x, 0, 0, 1);
+	float h = (Height + 16)/64.0f;
+	FragColor = vec4(h, h, h, 1.0);
 }

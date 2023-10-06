@@ -89,8 +89,8 @@ void Camera::OnMouseInput(double xpos, double ypos)
 
 void Camera::SetMatrices(ShaderProgram* shader)
 {
-	unsigned int projection_matrix_location = shader->GetUniformLocation("projection_matrix");
-	unsigned int view_matrix_location = shader->GetUniformLocation("view_matrix");
+	unsigned int projection_matrix_location = shader->GetUniformLocation("projection");
+	unsigned int view_matrix_location = shader->GetUniformLocation("view");
 
 	glUniformMatrix4fv(projection_matrix_location, 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, glm::value_ptr(GetViewMatrix()));

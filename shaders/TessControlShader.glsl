@@ -1,26 +1,31 @@
 #version 450
-layout(vertices = 3) out;
+// specify number of control points per patch output
+// this value controls the size of the input and output arrays
+layout (vertices=4) out;
 
-in vec3 vPos[];
-in vec2 vTexCoord[];
-out vec2 tcTexCoord[];
-
-uniform mat4 model_matrix;
-uniform mat4 view_matrix;
-uniform mat4 projection_matrix;
+// varying input from vertex shader
+in vec2 TexCoord[];
+// varying output to evaluation shader
+out vec2 TextureCoord[];
+int tessLevel;
 
 void main()
 {
-	gl_out[gl_InvocationID].gl_Position = vec4(vPos[gl_InvocationID], 1.0);
-	tcTexCoord[gl_InvocationID] = vTexCoord[gl_InvocationID];
+    // ----------------------------------------------------------------------
+    // pass attributes through
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    TextureCoord[gl_InvocationID] = TexCoord[gl_InvocationID];
 
-	if (gl_InvocationID == 0)
+    // ----------------------------------------------------------------------
+    // invocation zero controls tessellation levels for the entire patch
+    if (gl_InvocationID == 0)
     {
-        gl_TessLevelOuter[0] = 1;
-        gl_TessLevelOuter[1] = 1;
-        gl_TessLevelOuter[2] = 1;
+        gl_TessLevelOuter[0] = tessLevel;
+        gl_TessLevelOuter[1] = tessLevel;
+        gl_TessLevelOuter[2] = tessLevel;
+        gl_TessLevelOuter[3] = tessLevel;
 
-        gl_TessLevelInner[0] = 1;
-        gl_TessLevelInner[1] = 1;
+        gl_TessLevelInner[0] = tessLevel;
+        gl_TessLevelInner[1] = tessLevel;
     }
 }
