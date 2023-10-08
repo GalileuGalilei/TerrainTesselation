@@ -6,9 +6,10 @@
 #include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
 
-int window_width = 520;
-int window_heigh = 520;
-int tessLevel = 8;
+int window_width = 720;
+int window_heigh = 720;
+bool useNormalMap = false;
+glm::vec3 worldLightPos = glm::vec3(0.0f, 10.0f, 0.0f);
 Camera cam(window_width, window_heigh);
 GLFWwindow* window;
 
@@ -26,9 +27,9 @@ std::vector<float> squarePosition =
 std::vector<float> squareTexture =
 {
 	0.0f, 1.0f,	//0
-	0.0f, 0.0f,	//1
+	1.0f, 1.0f,	//3
 	1.0f, 0.0f,	//2
-	1.0f, 1.0f	//3
+	0.0f, 0.0f	//1
 };
 
 std::vector<GLuint> SquareIndice =
@@ -65,14 +66,23 @@ void OnKeyInput(GLFWwindow* window, int, int, int, int)
 		glfwSetWindowShouldClose(window, true);
 	}
 
+
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
-		tessLevel++;
+		useNormalMap = false;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
-		tessLevel--;
+		useNormalMap = false;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		useNormalMap = true;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 }
 
@@ -103,7 +113,7 @@ void InitOpenGL()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	//errors
@@ -129,7 +139,9 @@ int main()
 
 	//textures
 	Texture* tex = new Texture("resources/heightmap.jpg", true, GL_RGBA32F);
-	SHADER.SetTexture(tex, "Texture0");
+	Texture* tex2 = new Texture("resources/NormalMap.jpg", true, GL_RGBA32F);
+	SHADER.SetTexture(tex, "heightMap");
+	SHADER.SetTexture(tex2, "normalMap");
 
 	//vertices
 	Mesh* mesh = new Mesh();
@@ -140,7 +152,12 @@ int main()
 	//transformations
 	glm::mat4 model_matrix(1.0f);
 	int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
-	int tess_level_loc = glGetUniformLocation(SHADER.ShaderProgramID, "tessLevel");
+	int id_loc = glGetUniformLocation(SHADER.ShaderProgramID, "id");
+	int tess_block_loc = glGetUniformLocation(SHADER.ShaderProgramID, "tessLevel");
+	int light_loc = glGetUniformLocation(SHADER.ShaderProgramID, "worldLightPos");
+	int useNormalMap_loc = glGetUniformLocation(SHADER.ShaderProgramID, "useNormalMap");
+	float* tessLevel = new float[9];
+	float timer = 0.0f;
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
@@ -155,17 +172,49 @@ int main()
 		
 		//binding all
 		SHADER.ActivateTexture(tex);
+		SHADER.ActivateTexture(tex2);
 		SHADER.Use();
 
-		//models uniforms
-		glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
-		glUniform1i(tess_level_loc, tessLevel);
+		//uniforms
+		int id = 0;
 
-		//drawing
-		mesh->DrawMesh();
+		for (int y = 0; y < 3; y++)
+		{
+			for (int x = 0; x < 3; x++, id++)
+			{
+				glm::vec3 meshPos = glm::vec3(x * 2.0f, 0.0f, y * 2.0f);
+				tessLevel[id] = cam.CalculateTesselationLevel(meshPos);
+			}
+		}
+		glUniform1fv(tess_block_loc, 9, tessLevel);
+		glUniform1i(useNormalMap_loc, useNormalMap);
+		glUniform3f(light_loc, worldLightPos.x, worldLightPos.y, worldLightPos.z);
+
+		//move light position in circular movements
+		timer += 0.01;
+		worldLightPos.x = std::cos(timer) * 8;
+		worldLightPos.z = std::sin(timer) * 8;
+
+
+		id = 0;
+
+		for (int y = 0; y < 3; y++)
+		{
+			for (int x = 0; x < 3; x++, id++)
+			{
+				glm::vec3 meshPos = glm::vec3(x * 2.0f, 0.0f, y * 2.0f);
+				model_matrix = glm::translate(glm::mat4(1.0f), meshPos);
+
+				glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
+				glUniform1i(id_loc, id);
+				mesh->DrawMesh();
+			}
+		}
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
 
 	mesh->DeleteMesh();
 	SHADER.Delete();

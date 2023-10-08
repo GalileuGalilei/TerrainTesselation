@@ -30,6 +30,7 @@ public:
 	void OnKeyInput(GLFWwindow* window);
 	void OnWindowResize(int width, int height);
 	void SetMatrices(ShaderProgram* shader);
+	float CalculateTesselationLevel(glm::vec3 meshPos);
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
 	glm::vec3 GetCameraPosition();

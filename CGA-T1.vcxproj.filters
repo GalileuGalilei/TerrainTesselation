@@ -1372,5 +1372,8 @@
     <Image Include="resources\heightmap.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
+    <Image Include="resources\NormalMap.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
   </ItemGroup>
 </Project>

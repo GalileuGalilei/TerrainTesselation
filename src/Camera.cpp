@@ -96,6 +96,17 @@ void Camera::SetMatrices(ShaderProgram* shader)
 	glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, glm::value_ptr(GetViewMatrix()));
 }
 
+float Camera::CalculateTesselationLevel(glm::vec3 meshPos)
+{
+	float distance = glm::distance(camera_position, meshPos);
+	if (distance < 1.0f)
+	{
+		return 128.0f;
+	}
+
+	return 128.0f / distance;
+}
+
 void Camera::OnWindowResize(int width, int height)
 {
 	projection_matrix = glm::perspective((float)(3.141529 / 4.0), (float)(width / height), 0.1f, 300.0f);
