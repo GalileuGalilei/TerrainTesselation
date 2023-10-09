@@ -26,7 +26,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::OnKeyInput(GLFWwindow* window)
+void Camera::OnKeyInput(GLFWwindow* window, float deltaTime)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 	{
@@ -37,23 +37,23 @@ void Camera::OnKeyInput(GLFWwindow* window)
 	
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		camera_position -= cameraSpeed * camera_direction;
-		camera_target -= cameraSpeed * camera_direction;
+		camera_position -= cameraSpeed * camera_direction * deltaTime;
+		camera_target -= cameraSpeed * camera_direction * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		camera_position += cameraSpeed * camera_direction;
-		camera_target += cameraSpeed * camera_direction;
+		camera_position += cameraSpeed * camera_direction * deltaTime;
+		camera_target += cameraSpeed * camera_direction * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		camera_position -= camera_x_axis * cameraSpeed;
-		camera_target -= camera_x_axis * cameraSpeed;
+		camera_position -= camera_x_axis * cameraSpeed * deltaTime;
+		camera_target -= camera_x_axis * cameraSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		camera_position += camera_x_axis * cameraSpeed;
-		camera_target += camera_x_axis * cameraSpeed;
+		camera_position += camera_x_axis * cameraSpeed * deltaTime;
+		camera_target += camera_x_axis * cameraSpeed * deltaTime;
 	}
 	
 	RecalculateAxis();

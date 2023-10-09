@@ -18,7 +18,6 @@ GLFWwindow* window;
 
 std::vector<float> squarePosition =
 {          
-	//quadrado que chegue at[e as bordas da tela
 	-1.0f, 0.0f, 1.0f, 	//0
 	1.0f, 0.0f, 1.0f,	//1
 	1.0f, 0.0f, -1.0f,	//3
@@ -188,6 +187,7 @@ int main()
 
 	float* tessLevel = new float[9];
 	float timer = 0.0f;
+	float lastTime = 0.0f;
 
 	//lights
 	Cube* light1 = new Cube();
@@ -211,7 +211,7 @@ int main()
 		SHADER.Use();
 
 		//camera inputs
-		cam.OnKeyInput(window);
+		cam.OnKeyInput(window, timer - lastTime);
 		cam.SetMatrices(&SHADER);
 
 		//uniforms
@@ -247,15 +247,19 @@ int main()
 		}
 
 		//lights
-		glUniform3f(light_loc1, std::cos(timer) * 8, 6, std::sin(timer) * 8);
-		glUniform3f(light_loc2, std::cos(timer + 1.6) * 8, 6, std::sin(timer + 1.6) * 8);
+		float deltaTime = timer - lastTime;
+		deltaTime *= 8;
+		glUniform3f(light_loc1, std::cos(deltaTime) * 8, 6, std::sin(deltaTime) * 8);
+		glUniform3f(light_loc2, std::cos(deltaTime + 1.6) * 8, 6, std::sin(deltaTime + 1.6) * 8);
 		
-		light1->SetPosition(glm::vec3(std::sin(timer) * 8, 6, std::sin(timer) * 8));
+		light1->SetPosition(glm::vec3(std::sin(deltaTime) * 8, 6, std::sin(deltaTime) * 8));
 		light1->SetViewProjection(&cam);
-		light2->SetPosition(glm::vec3(std::cos(timer + 1.6) * 8, 6, std::sin(timer + 2.6) * 8));
+		light2->SetPosition(glm::vec3(std::cos(deltaTime + 1.6) * 8, 6, std::sin(deltaTime + 2.6) * 8));
 		light2->SetViewProjection(&cam);
 		
-		timer += 0.01;
+		lastTime = timer;
+		timer += glfwGetTime() * 0.1;
+
 
 		light1->Draw();
 		light2->Draw();

@@ -27,7 +27,7 @@ public:
 	Camera(int width, int height);
 	~Camera();
 	void OnMouseInput(double xpos, double ypos);
-	void OnKeyInput(GLFWwindow* window);
+	void OnKeyInput(GLFWwindow* window, float deltaTime);
 	void OnWindowResize(int width, int height);
 	void SetMatrices(ShaderProgram* shader);
 	float CalculateTesselationLevel(glm::vec3 meshPos);
