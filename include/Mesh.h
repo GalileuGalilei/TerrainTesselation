@@ -31,7 +31,7 @@ public:
 	void Bind();
 	void Unbind();
 
-	void DrawMesh();
+	void DrawMesh(GLenum mode);
 	void DeleteMesh();
 };
 

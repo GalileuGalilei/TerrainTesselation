@@ -97,8 +97,8 @@ void Mesh::DeleteMesh()
 	attributesOffset.clear();
 }
 
-void Mesh::DrawMesh()
+void Mesh::DrawMesh(GLenum mode)
 {
 	Bind();
-	glDrawElements(GL_PATCHES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(mode, indices.size(), GL_UNSIGNED_INT, 0);
 }

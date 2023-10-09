@@ -1,19 +1,16 @@
 #version 450 core
 layout (quads, fractional_odd_spacing, ccw) in;
 
-uniform sampler2D heightMap;  // the texture corresponding to our height map
-uniform mat4 model;           // the model matrix
-uniform mat4 view;            // the view matrix
-uniform mat4 projection;      // the projection matrix
+uniform sampler2D heightMap; 
+uniform mat4 model;       
+uniform mat4 view;    
+uniform mat4 projection;    
 
-// received from Tessellation Control Shader - all texture coordinates for the patch vertices
 in vec2 TextureCoord[];
-out vec2 TexCoord;
+out vec2 geoTexCoord;
 
-// send to Fragment Shader for coloring
-out float Height;
-out vec3 worldPos; 
-//out vec3 worldNormal;
+//send to geometry shader
+out vec3 geoWorldPos; 
 
 void main()
 {
@@ -32,10 +29,8 @@ void main()
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     vec2 texCoord = (t1 - t0) * v + t0;
-    TexCoord = texCoord;
+    geoTexCoord = texCoord;
 
-    // lookup texel at patch coordinate for height and scale + shift as desired
-    Height = texture(heightMap, texCoord).y;
 
     // ----------------------------------------------------------------------
     // retrieve control point position coordinates
@@ -51,7 +46,7 @@ void main()
     vec4 p = (p1 - p0) * v + p0;
 
     // displace point
-    p.y += Height;
+    p.y += texture(heightMap, texCoord).y;
 
     // recalculate the new normal
     //worldNormal = normal.xyz;
@@ -59,5 +54,5 @@ void main()
     // ----------------------------------------------------------------------
     // output patch point position in clip space
     gl_Position = projection * view * model * p;
-    worldPos = p.xyz;
+    geoWorldPos = (model * p).xyz;
 }

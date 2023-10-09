@@ -39,6 +39,9 @@
     <ClCompile Include="glfw\include\glm\detail\glm.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="src\Cube.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stb_image.h">
@@ -935,6 +938,9 @@
     <ClInclude Include="glfw\include\KHR\khrplatform.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="include\Cube.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\VertexShader.glsl" />
@@ -1364,6 +1370,9 @@
     </None>
     <None Include="shaders\TessControlShader.glsl" />
     <None Include="shaders\TessEvaluationShader.glsl" />
+    <None Include="shaders\GeometryShader.glsl" />
+    <None Include="shaders\cubeFrag.glsl" />
+    <None Include="shaders\cubeVert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="glfw\glfw3.lib" />

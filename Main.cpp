@@ -5,11 +5,12 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "Cube.h"
 
 int window_width = 720;
 int window_heigh = 720;
+int forcedQuadTessLevel[9] = { 0,0,0,0,0,0,0,0,0 };
 bool useNormalMap = false;
-glm::vec3 worldLightPos = glm::vec3(0.0f, 10.0f, 0.0f);
 Camera cam(window_width, window_heigh);
 GLFWwindow* window;
 
@@ -66,7 +67,6 @@ void OnKeyInput(GLFWwindow* window, int, int, int, int)
 		glfwSetWindowShouldClose(window, true);
 	}
 
-
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
 		useNormalMap = false;
@@ -86,6 +86,29 @@ void OnKeyInput(GLFWwindow* window, int, int, int, int)
 	}
 }
 
+void numpadCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (action == GLFW_PRESS) {
+		// Check if the pressed key is in the numpad range
+		if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_9) {
+			int numpadNumber = key - GLFW_KEY_KP_0;
+			
+			if (numpadNumber < 1)
+			{
+				return;
+			}
+
+			if (mods == GLFW_MOD_ALT) 
+			{
+				forcedQuadTessLevel[numpadNumber - 1] -= 1;
+			}
+			else 
+			{
+				forcedQuadTessLevel[numpadNumber - 1] += 1;
+			}
+		}
+	}
+}
+
 #pragma endregion
 
 void InitGladAndGLFW()
@@ -98,7 +121,11 @@ void InitGladAndGLFW()
 	window = glfwCreateWindow(window_width, window_heigh, "JANELA", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSetCursorPosCallback(window, OnMouseInput);
-	glfwSetKeyCallback(window, OnKeyInput);
+	glfwSetKeyCallback(window, [] (GLFWwindow * window, int key, int scancode, int action, int mods) -> void
+	{
+		OnKeyInput(window, key, scancode, action, mods);
+		numpadCallback(window, key, scancode, action, mods);
+	});
 
 	glfwSetFramebufferSizeCallback(window, OnWindowResize);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -134,6 +161,7 @@ int main()
 	SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
 	SHADER.CreateShader(GL_TESS_CONTROL_SHADER, "shaders/TessControlShader.glsl");
 	SHADER.CreateShader(GL_TESS_EVALUATION_SHADER, "shaders/TessEvaluationShader.glsl");
+	SHADER.CreateShader(GL_GEOMETRY_SHADER, "shaders/GeometryShader.glsl");
 	SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
 	SHADER.Use();
 
@@ -154,10 +182,19 @@ int main()
 	int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
 	int id_loc = glGetUniformLocation(SHADER.ShaderProgramID, "id");
 	int tess_block_loc = glGetUniformLocation(SHADER.ShaderProgramID, "tessLevel");
-	int light_loc = glGetUniformLocation(SHADER.ShaderProgramID, "worldLightPos");
+	int light_loc1 = glGetUniformLocation(SHADER.ShaderProgramID, "worldLightPos1");
+	int light_loc2 = glGetUniformLocation(SHADER.ShaderProgramID, "worldLightPos2");
 	int useNormalMap_loc = glGetUniformLocation(SHADER.ShaderProgramID, "useNormalMap");
+
 	float* tessLevel = new float[9];
 	float timer = 0.0f;
+
+	//lights
+	Cube* light1 = new Cube();
+	light1->Init();
+	Cube* light2 = new Cube();
+	light2->Init();
+	
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
@@ -166,14 +203,16 @@ int main()
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//camera inputs
-		cam.OnKeyInput(window);
-		cam.SetMatrices(&SHADER);
 		
+
 		//binding all
 		SHADER.ActivateTexture(tex);
 		SHADER.ActivateTexture(tex2);
 		SHADER.Use();
+
+		//camera inputs
+		cam.OnKeyInput(window);
+		cam.SetMatrices(&SHADER);
 
 		//uniforms
 		int id = 0;
@@ -182,19 +221,13 @@ int main()
 		{
 			for (int x = 0; x < 3; x++, id++)
 			{
-				glm::vec3 meshPos = glm::vec3(x * 2.0f, 0.0f, y * 2.0f);
-				tessLevel[id] = cam.CalculateTesselationLevel(meshPos);
+				glm::vec3 meshPos = glm::vec3(x * 4.0f, 0.0f, y * 4.0f);
+				tessLevel[id] = cam.CalculateTesselationLevel(meshPos) + forcedQuadTessLevel[id];
 			}
 		}
+
 		glUniform1fv(tess_block_loc, 9, tessLevel);
 		glUniform1i(useNormalMap_loc, useNormalMap);
-		glUniform3f(light_loc, worldLightPos.x, worldLightPos.y, worldLightPos.z);
-
-		//move light position in circular movements
-		timer += 0.01;
-		worldLightPos.x = std::cos(timer) * 8;
-		worldLightPos.z = std::sin(timer) * 8;
-
 
 		id = 0;
 
@@ -202,15 +235,30 @@ int main()
 		{
 			for (int x = 0; x < 3; x++, id++)
 			{
-				glm::vec3 meshPos = glm::vec3(x * 2.0f, 0.0f, y * 2.0f);
+				glm::vec3 meshPos = glm::vec3(x * 4.0f, 0.0f, y * 4.0f);
 				model_matrix = glm::translate(glm::mat4(1.0f), meshPos);
+				model_matrix *= glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+				
 
 				glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
 				glUniform1i(id_loc, id);
-				mesh->DrawMesh();
+				mesh->DrawMesh(GL_PATCHES);
 			}
 		}
 
+		//lights
+		glUniform3f(light_loc1, std::cos(timer) * 8, 6, std::sin(timer) * 8);
+		glUniform3f(light_loc2, std::cos(timer + 1.6) * 8, 6, std::sin(timer + 1.6) * 8);
+		
+		light1->SetPosition(glm::vec3(std::sin(timer) * 8, 6, std::sin(timer) * 8));
+		light1->SetViewProjection(&cam);
+		light2->SetPosition(glm::vec3(std::cos(timer + 1.6) * 8, 6, std::sin(timer + 2.6) * 8));
+		light2->SetViewProjection(&cam);
+		
+		timer += 0.01;
+
+		light1->Draw();
+		light2->Draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Cube.cpp" />
     <ClCompile Include="glfw\include\glm\detail\glm.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="GLAD\src\glad.c" />
@@ -165,6 +166,7 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Cube.h" />
     <ClInclude Include="glfw\include\GLFW\glfw3.h" />
     <ClInclude Include="glfw\include\GLFW\glfw3native.h" />
     <ClInclude Include="glfw\include\glm\common.hpp" />
@@ -606,7 +608,10 @@
     <None Include="glfw\include\glm\gtx\wrap.inl" />
     <None Include="glfw\include\glm\out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_C.bin" />
     <None Include="glfw\include\glm\out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_CXX.bin" />
+    <None Include="shaders\cubeFrag.glsl" />
+    <None Include="shaders\cubeVert.glsl" />
     <None Include="shaders\FragmentShader.glsl" />
+    <None Include="shaders\GeometryShader.glsl" />
     <None Include="shaders\TessEvaluationShader.glsl" />
     <None Include="shaders\VertexShader.glsl" />
     <None Include="shaders\TessControlShader.glsl" />
